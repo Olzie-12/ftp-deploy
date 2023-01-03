@@ -1,4 +1,4 @@
-import * as ftp from "basic-ftp";
+import * as ftp from "qusly-core";
 import fs from "fs";
 import { IFileList, IDiff, syncFileDescription, currentSyncFileVersion, IFtpDeployArgumentsWithDefaults } from "./types";
 import { HashDiff } from "./HashDiff";
