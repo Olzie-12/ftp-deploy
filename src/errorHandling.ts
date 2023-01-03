@@ -1,6 +1,6 @@
 import { ILogger } from "./utilities";
 import { IFtpDeployArgumentsWithDefaults, ErrorCode } from "./types";
-import { FTPError } from "basic-ftp";
+import { FTPError } from "qusly-core";
 
 
 function logOriginalError(logger: ILogger, error: any) {
