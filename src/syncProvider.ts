@@ -1,5 +1,5 @@
 import prettyBytes from "pretty-bytes";
-import type * as ftp from "basic-ftp";
+import type * as ftp from "qusly-core";
 import { DiffResult, ErrorCode, IFilePath } from "./types";
 import { ILogger, pluralize, retryRequest, ITimings } from "./utilities";
 
