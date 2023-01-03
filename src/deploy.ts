@@ -31,27 +31,18 @@ function createLocalState(localFiles: IFileList, logger: ILogger, args: IFtpDepl
 
 async function connect(client: ftp.Client, args: IFtpDeployArgumentsWithDefaults, logger: ILogger) {
     let secure: boolean | "implicit" = false;
-    if (args.protocol === "ftps") {
-        secure = true;
-    }
-    else if (args.protocol === "ftps-legacy") {
-        secure = "implicit";
-    }
-
     client.ftp.verbose = args["log-level"] === "verbose";
-
     const rejectUnauthorized = args.security === "strict";
-
     try {
         await client.access({
             host: args.server,
             user: args.username,
             password: args.password,
             port: args.port,
-            secure: secure,
-            secureOptions: {
-                rejectUnauthorized: rejectUnauthorized
-            }
+            protocol: args.protocol,
+//             secureOptions: {
+//                 rejectUnauthorized: rejectUnauthorized
+//             }
         });
     }
     catch (error) {
