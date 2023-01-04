@@ -178,7 +178,7 @@ export function getDefaultSettings(withoutDefaults: IFtpDeployArguments): IFtpDe
         "server": withoutDefaults.server,
         "username": withoutDefaults.username,
         "password": withoutDefaults.password,
-        "port": withoutDefaults.port ?? 21,
+        "port": withoutDefaults.port ?? 22,
         "protocol": withoutDefaults.protocol ?? "ftp",
         "local-dir": withoutDefaults["local-dir"] ?? "./",
         "server-dir": withoutDefaults["server-dir"] ?? "./",
