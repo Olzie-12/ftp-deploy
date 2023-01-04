@@ -731,7 +731,7 @@ describe("getDefaultSettings", () => {
             server: "a",
             username: "b",
             password: "c",
-            port: 21,
+            port: 22,
             protocol: "ftp",
             "local-dir": "./",
             "server-dir": "./",
