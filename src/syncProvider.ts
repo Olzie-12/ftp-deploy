@@ -8,9 +8,7 @@ export async function ensureDir(client: ftp.Client, logger: ILogger, timings: IT
     logger.verbose(`  changing dir to ${folder}`);
 
     await retryRequest(logger, async () => await client.createFolder(folder).catch(reason => {
-        if (reason.message == "File already exists") {
-            return;
-        }
+        console.log(reason)
     }));
 
     logger.verbose(`  dir changed`);
@@ -70,7 +68,7 @@ export class FTPSyncProvider implements ISyncProvider {
     }
 
     async createFolder(folderPath: string) {
-        this.logger.all(`creating folder "${folderPath + "/"}"`);
+        this.logger.all(`creating folder "${folderPath}"`);
 
         if (this.dryRun === true) {
             return;
@@ -127,7 +125,7 @@ export class FTPSyncProvider implements ISyncProvider {
         this.logger.all(`${typePresent} "${filePath}"`);
 
         if (this.dryRun === false) {
-            await retryRequest(this.logger, async () => await this.client.upload(filePath.substring(this.serverPath.length), filePath));
+            await retryRequest(this.logger, async () => await this.client.upload(this.localPath + filePath.substring(this.serverPath.length), filePath));
         }
 
         this.logger.verbose(`  file ${typePast}`);
@@ -170,7 +168,7 @@ export class FTPSyncProvider implements ISyncProvider {
         this.logger.all(`----------------------------------------------------------------`);
         this.logger.all(`🎉 Sync complete. Saving current server state to "${this.serverPath + this.stateName}"`);
         if (this.dryRun === false) {
-            await retryRequest(this.logger, async () => await this.client.upload(this.localPath + this.stateName, this.stateName));
+            await retryRequest(this.logger, async () => await this.client.upload(this.localPath + this.stateName, this.serverPath + this.stateName));
         }
     }
 }

@@ -13,8 +13,10 @@ async function downloadFileList(client: ftp.Client, logger: ILogger, path: strin
     // note: originally this was using a writable stream instead of a buffer file
     // basic-ftp doesn't seam to close the connection when using steams over some ftps connections. This appears to be dependent on the ftp server
     const tempFileNameHack = ".ftp-deploy-sync-server-state-buffer-file---delete.json";
-
-    await retryRequest(logger, async () => await client.download(tempFileNameHack, path));
+    await retryRequest(logger, async () => await client.download(tempFileNameHack, path).catch(reason => {
+        console.log(reason)
+        fs.unlinkSync(tempFileNameHack);
+    }));
 
     const fileAsString = fs.readFileSync(tempFileNameHack, {encoding: "utf-8"});
     const fileAsObject = JSON.parse(fileAsString) as IFileList;
@@ -96,7 +98,7 @@ export async function getServerFiles(client: ftp.Client, logger: ILogger, timing
             throw new Error("dangerous-clean-slate was run");
         }
 
-        const serverFiles = await downloadFileList(client, logger, args["state-name"]);
+        const serverFiles = await downloadFileList(client, logger, args["server-dir"] + args["state-name"]);
         logger.all(`----------------------------------------------------------------`);
         logger.all(`Last published on 📅 ${new Date(serverFiles.generatedTime).toLocaleDateString(undefined, {
             weekday: "long",
@@ -147,10 +149,10 @@ export async function deploy(args: IFtpDeployArgumentsWithDefaults, logger: ILog
     timings.start("hash");
     const localFiles = await getLocalFiles(args);
     timings.stop("hash");
-
+    const client = new ftp.Client( {
+        pool: 5,
+    });
     createLocalState(localFiles, logger, args);
-
-    const client = new ftp.Client();
     global.reconnect = async function () {
         timings.start("connecting");
         await connect(client, args, logger);
@@ -158,7 +160,6 @@ export async function deploy(args: IFtpDeployArgumentsWithDefaults, logger: ILog
     }
     if (args["log-level"] === "verbose") {
         client.addListener("transfer-progress", (transfer: ITransfer, progress: ITransferProgress) => {
-
             logger.verbose(`Transfer progress for "${transfer.localPath}" to "${transfer.remotePath}". Progress: ${progress.bytes} bytes of ${progress.totalBytes} bytes`);
         });
     }
@@ -177,7 +178,6 @@ export async function deploy(args: IFtpDeployArgumentsWithDefaults, logger: ILog
         logger.standard(`----------------------------------------------------------------`);
         logger.standard(`Calculating differences between client & server`);
         logger.standard(`----------------------------------------------------------------`);
-
         const diffs = diffTool.getDiffs(localFiles, serverFiles);
 
         diffs.upload.filter((itemUpload) => itemUpload.type === "folder").map((itemUpload) => {
