@@ -70,14 +70,15 @@ async function connect(client: ftp.Client, args: IFtpDeployArgumentsWithDefaults
 
 export async function clearWorkingDir(client: ftp.Client, dir: string) {
     for (const file of await (dir == null ? client.list() : client.list(dir))) {
+        console.log(file.name)
         if (file.type == 'folder') {
-            await clearWorkingDir(client, dir)
             if (file.name != null) {
-                await client.removeEmptyFolder(file.name)
+                await clearWorkingDir(client, dir + file.name);
+                await client.removeEmptyFolder(dir + file.name)
             }
         } else {
             if (file.name != null) {
-                await client.removeFile(file.name)
+                await client.removeFile(dir + file.name)
             }
         }
     }
