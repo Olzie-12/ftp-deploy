@@ -7,7 +7,6 @@ import prettyBytes from "pretty-bytes";
 import {prettyError} from "./errorHandling";
 import {ensureDir, FTPSyncProvider} from "./syncProvider";
 import {getLocalFiles} from "./localFiles";
-import {ITransferProgressListener} from "qusly-core/build/interfaces/transfer";
 import {ITransfer, ITransferProgress} from "qusly-core";
 
 async function downloadFileList(client: ftp.Client, logger: ILogger, path: string): Promise<IFileList> {
