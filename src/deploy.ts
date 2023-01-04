@@ -69,36 +69,36 @@ async function connect(client: ftp.Client, args: IFtpDeployArgumentsWithDefaults
 }
 
 export async function clearWorkingDir(client: ftp.Client, dir: string) {
-    for (const file of await (dir == null ? client.list() : client.list(dir))) {
-        console.log(file.name)
-        if (file.type == 'folder') {
-            if (file.name != null) {
-                await clearWorkingDir(client, dir + file.name);
-                await client.removeEmptyFolder(dir + file.name)
-            }
-        } else {
-            if (file.name != null) {
-                await client.removeFile(dir + file.name)
-            }
-        }
-    }
+    await client.removeFolder(dir).catch(() => {});
+
+    // for (const file of await (dir == null ? client.list() : client.list(dir))) {
+    //     console.log(file.name)
+    //     if (file.name == null) continue;
+    //
+    //     if (file.type == 'folder') {
+    //         await clearWorkingDir(client, dir + file.name).finally(async () => {
+    //             await client.removeEmptyFolder(dir + file.name);
+    //         });
+    //     } else {
+    //         await client.remo(dir + file.name)
+    //     }
+    // }
 }
 
 export async function getServerFiles(client: ftp.Client, logger: ILogger, timings: ITimings, args: IFtpDeployArgumentsWithDefaults): Promise<IFileList> {
     try {
-        await ensureDir(client, logger, timings, args["server-dir"]);
-
         if (args["dangerous-clean-slate"]) {
             logger.all(`----------------------------------------------------------------`);
             logger.all("🗑️ Removing all files on the server because 'dangerous-clean-slate' was set, this will make the deployment very slow...");
             if (args["dry-run"] === false) {
                 await clearWorkingDir(client, args["server-dir"]);
             }
+            await ensureDir(client, logger, timings, args["server-dir"]);
             logger.all("Clear complete");
 
             throw new Error("dangerous-clean-slate was run");
         }
-
+        await ensureDir(client, logger, timings, args["server-dir"]);
         const serverFiles = await downloadFileList(client, logger, args["server-dir"] + args["state-name"]);
         logger.all(`----------------------------------------------------------------`);
         logger.all(`Last published on 📅 ${new Date(serverFiles.generatedTime).toLocaleDateString(undefined, {
@@ -150,7 +150,7 @@ export async function deploy(args: IFtpDeployArgumentsWithDefaults, logger: ILog
     timings.start("hash");
     const localFiles = await getLocalFiles(args);
     timings.stop("hash");
-    const client = new ftp.Client( {
+    const client = new ftp.Client({
         pool: 5,
     });
     createLocalState(localFiles, logger, args);
