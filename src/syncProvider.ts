@@ -1,6 +1,6 @@
 import prettyBytes from "pretty-bytes";
 import type * as ftp from "qusly-core";
-import {DiffResult, ErrorCode, IFilePath, IFtpDeployArgumentsWithDefaults} from "./types";
+import {DiffResult, ErrorCode, IFilePath} from "./types";
 import { ILogger, pluralize, retryRequest, ITimings } from "./utilities";
 
 export async function ensureDir(client: ftp.Client, logger: ILogger, timings: ITimings, folder: string): Promise<void> {
@@ -47,7 +47,7 @@ export class FTPSyncProvider implements ISyncProvider {
     private logger: ILogger;
     private timings: ITimings;
     private localPath: string;
-    private serverPath: string;
+    serverPath: string;
     private dryRun: boolean;
     private stateName: string;
 
