@@ -37,7 +37,9 @@ async function connect(client: ftp.Client, args: IFtpDeployArgumentsWithDefaults
                 user: args.username,
                 password: args.password,
                 port: args.port,
-                protocol: "sftp"
+                protocol: "sftp",
+            }, {
+                timeout: args.timeout,
             });
         } else {
             await client.connect({
@@ -45,7 +47,12 @@ async function connect(client: ftp.Client, args: IFtpDeployArgumentsWithDefaults
                 user: args.username,
                 password: args.password,
                 port: args.port,
-                protocol: args.protocol
+                protocol: args.protocol,
+            }, {
+                secureOptions: {
+                    rejectUnauthorized: args.security == "strict",
+                    timeout: args.timeout,
+                }
             });
         }
     }
