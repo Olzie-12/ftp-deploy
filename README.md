@@ -4,8 +4,8 @@ Syncs a local folder with a remote folder over ftp.
 
 After the initial sync only differences are synced, making deployments super fast!
 
-[![Latest Stable Version](https://img.shields.io/npm/v/@samkirkland/ftp-deploy.svg?style=flat-square)](https://www.npmjs.com/package/@olzie-12/ftp-deploy)
-[![NPM Downloads](https://img.shields.io/npm/dt/@samkirkland/ftp-deploy.svg?style=flat-square)](https://www.npmjs.com/package/@olzie-12/ftp-deploy)
+[![Latest Stable Version](https://img.shields.io/npm/v/@olzie-12/ftp-deploy.svg?style=flat-square)](https://www.npmjs.com/package/@olzie-12/ftp-deploy)
+[![NPM Downloads](https://img.shields.io/npm/dt/@olzie-12/ftp-deploy.svg?style=flat-square)](https://www.npmjs.com/package/@olzie-12/ftp-deploy)
 
 ---
 
