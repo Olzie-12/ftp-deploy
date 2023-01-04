@@ -179,7 +179,7 @@ export function getDefaultSettings(withoutDefaults: IFtpDeployArguments): IFtpDe
         "username": withoutDefaults.username,
         "password": withoutDefaults.password,
         "port": withoutDefaults.port ?? 22,
-        "protocol": withoutDefaults.protocol ?? "ftp",
+        "protocol": withoutDefaults.protocol ?? "sftp",
         "local-dir": withoutDefaults["local-dir"] ?? "./",
         "server-dir": withoutDefaults["server-dir"] ?? "./",
         "state-name": withoutDefaults["state-name"] ?? ".ftp-deploy-sync-state.json",
