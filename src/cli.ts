@@ -8,7 +8,7 @@ const argv = yargs.options({
     "server": { type: "string", demandOption: true },
     "username": { type: "string", demandOption: true },
     "password": { type: "string", demandOption: true },
-    "port": { type: "number", default: 21 },
+    "port": { type: "number", default: 22 },
     "local-dir": { type: "string", default: "./" },
     "server-dir": { type: "string", default: "./" },
     "state-name": { type: "string", default: ".ftp-deploy-sync-state.json" },
@@ -16,7 +16,7 @@ const argv = yargs.options({
     "dangerous-clean-slate": { type: "boolean", default: false, description: "Deletes ALL contents of server-dir, even items in excluded with 'exclude' argument" },
     "exclude": { type: "array", default: excludeDefaults, description: "An array of glob patterns, these files will not be included in the publish/delete process" },
     "log-level": { choices: ["minimal", "standard", "verbose"], default: "standard", description: "How much information should print. minimal=only important info, standard=important info and basic file changes, verbose=print everything the script is doing" },
-    "security": { choices: ["strict", "loose"], default: "loose", description: "" }
+    "protocol": { choices: ["sftp", "ftp", "ftps"], default: "ftp", description: "" }
 })
     .example("$0 --server ftp://samkirkland.com --username user --password pass", "")
     .help("help")

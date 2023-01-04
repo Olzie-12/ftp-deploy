@@ -18,7 +18,7 @@ export interface IFtpDeployArguments {
      * "ftps-legacy": full encryption legacy standard (aka "implicit" ftps)
      * @default "ftp"
      */
-    protocol?: "ftp" | "ftps" | "ftps-legacy";
+    protocol?: "ftp" | "ftps" | "sftp";
 
     /** @default "./" */
     "local-dir"?: string;
@@ -74,7 +74,7 @@ export interface IFtpDeployArgumentsWithDefaults {
     username: string;
     password: string;
     port: number;
-    protocol: "ftp" | "ftps" | "ftps-legacy";
+    protocol: "ftp" | "ftps" | "sftp";
     "local-dir": string;
     "server-dir": string;
     "state-name": string;

@@ -1,6 +1,5 @@
 import { ILogger } from "./utilities";
-import { IFtpDeployArgumentsWithDefaults, ErrorCode } from "./types";
-import { FTPError } from "qusly-core";
+import {IFtpDeployArgumentsWithDefaults} from "./types";
 
 
 function logOriginalError(logger: ILogger, error: any) {
@@ -23,7 +22,6 @@ export function prettyError(logger: ILogger, args: IFtpDeployArgumentsWithDefaul
     logger.all(`--------------  🔥🔥🔥 an error occurred  🔥🔥🔥  --------------`);
     logger.all(`----------------------------------------------------------------`);
 
-    const ftpError = error as FTPError;
     if (typeof error.code === "string") {
         const errorCode = error.code as string;
 
@@ -41,20 +39,20 @@ export function prettyError(logger: ILogger, args: IFtpDeployArgumentsWithDefaul
             logger.all(` - Contact your hosting provider and ask them for your servers hostname`);
         }
     }
-    else if (typeof ftpError.code === "number") {
-        if (ftpError.code === ErrorCode.NotLoggedIn) {
-            const serverRequiresFTPS = ftpError.message.toLowerCase().includes("must use encryption");
-
-            if (serverRequiresFTPS) {
-                logger.all(`The server you are connecting to requires encryption (ftps)`);
-                logger.all(`Enable FTPS by using the protocol option.`);
-            }
-            else {
-                logger.all(`Could not login with the username "${args.username}" and password "${args.password}".`);
-                logger.all(`Make sure you can login with those credentials. If you have a space or a quote in your username or password be sure to escape them!`);
-            }
-        }
-    }
+    // else if (typeof ftpError.code === "number") {
+    //     if (ftpError.code === ErrorCode.NotLoggedIn) {
+    //         const serverRequiresFTPS = ftpError.message.toLowerCase().includes("must use encryption");
+    //
+    //         if (serverRequiresFTPS) {
+    //             logger.all(`The server you are connecting to requires encryption (ftps)`);
+    //             logger.all(`Enable FTPS by using the protocol option.`);
+    //         }
+    //         else {
+    //             logger.all(`Could not login with the username "${args.username}" and password "${args.password}".`);
+    //             logger.all(`Make sure you can login with those credentials. If you have a space or a quote in your username or password be sure to escape them!`);
+    //         }
+    //     }
+    // }
 
     logOriginalError(logger, error);
 }

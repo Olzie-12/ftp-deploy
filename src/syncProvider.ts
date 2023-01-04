@@ -1,13 +1,17 @@
 import prettyBytes from "pretty-bytes";
 import type * as ftp from "qusly-core";
-import { DiffResult, ErrorCode, IFilePath } from "./types";
+import {DiffResult, ErrorCode, IFilePath, IFtpDeployArgumentsWithDefaults} from "./types";
 import { ILogger, pluralize, retryRequest, ITimings } from "./utilities";
 
 export async function ensureDir(client: ftp.Client, logger: ILogger, timings: ITimings, folder: string): Promise<void> {
     timings.start("changingDir");
     logger.verbose(`  changing dir to ${folder}`);
 
-    await retryRequest(logger, async () => await client.ensureDir(folder));
+    await retryRequest(logger, async () => await client.createFolder(folder).catch(reason => {
+        if (reason.message == "File already exists") {
+            return;
+        }
+    }));
 
     logger.verbose(`  dir changed`);
     timings.stop("changingDir");
@@ -65,20 +69,6 @@ export class FTPSyncProvider implements ISyncProvider {
         };
     }
 
-    /**
-     * Navigates up {dirCount} number of directories from the current working dir
-     */
-    private async upDir(dirCount: number | null | undefined): Promise<void> {
-        if (typeof dirCount !== "number") {
-            return;
-        }
-
-        // navigate back to the starting folder
-        for (let i = 0; i < dirCount; i++) {
-            await retryRequest(this.logger, async () => await this.client.cdup());
-        }
-    }
-
     async createFolder(folderPath: string) {
         this.logger.all(`creating folder "${folderPath + "/"}"`);
 
@@ -95,9 +85,6 @@ export class FTPSyncProvider implements ISyncProvider {
             await ensureDir(this.client, this.logger, this.timings, path.folders.join("/"));
         }
 
-        // navigate back to the root folder
-        await this.upDir(path.folders?.length);
-
         this.logger.verbose(`  completed`);
     }
 
@@ -106,7 +93,7 @@ export class FTPSyncProvider implements ISyncProvider {
 
         if (this.dryRun === false) {
             try {
-                await retryRequest(this.logger, async () => await this.client.remove(filePath));
+                await retryRequest(this.logger, async () => await this.client.removeFile(filePath));
             }
             catch (e: any) {
                 // this error is common when a file was deleted on the server directly
@@ -128,7 +115,7 @@ export class FTPSyncProvider implements ISyncProvider {
         this.logger.all(`removing folder "${absoluteFolderPath}"`);
 
         if (this.dryRun === false) {
-            await retryRequest(this.logger, async () => await this.client.removeDir(absoluteFolderPath));
+            await retryRequest(this.logger, async () => await this.client.removeFolder(absoluteFolderPath));
         }
 
         this.logger.verbose(`  completed`);
@@ -140,7 +127,7 @@ export class FTPSyncProvider implements ISyncProvider {
         this.logger.all(`${typePresent} "${filePath}"`);
 
         if (this.dryRun === false) {
-            await retryRequest(this.logger, async () => await this.client.uploadFrom(this.localPath + filePath, filePath));
+            await retryRequest(this.logger, async () => await this.client.upload(filePath.substring(this.serverPath.length), filePath));
         }
 
         this.logger.verbose(`  file ${typePast}`);
@@ -156,34 +143,34 @@ export class FTPSyncProvider implements ISyncProvider {
 
         // create new folders
         for (const file of diffs.upload.filter(item => item.type === "folder")) {
-            await this.createFolder(file.name);
+            await this.createFolder(this.serverPath + file.name);
         }
 
         // upload new files
         for (const file of diffs.upload.filter(item => item.type === "file").filter(item => item.name !== this.stateName)) {
-            await this.uploadFile(file.name, "upload");
+            await this.uploadFile(this.serverPath + file.name, "upload");
         }
 
         // replace new files
         for (const file of diffs.replace.filter(item => item.type === "file").filter(item => item.name !== this.stateName)) {
             // note: FTP will replace old files with new files. We run replacements after uploads to limit downtime
-            await this.uploadFile(file.name, "replace");
+            await this.uploadFile(this.serverPath + file.name, "replace");
         }
 
         // delete old files
         for (const file of diffs.delete.filter(item => item.type === "file")) {
-            await this.removeFile(file.name);
+            await this.removeFile(this.serverPath + file.name);
         }
 
         // delete old folders
         for (const file of diffs.delete.filter(item => item.type === "folder")) {
-            await this.removeFolder(file.name);
+            await this.removeFolder(this.serverPath + file.name);
         }
 
         this.logger.all(`----------------------------------------------------------------`);
         this.logger.all(`🎉 Sync complete. Saving current server state to "${this.serverPath + this.stateName}"`);
         if (this.dryRun === false) {
-            await retryRequest(this.logger, async () => await this.client.uploadFrom(this.localPath + this.stateName, this.stateName));
+            await retryRequest(this.logger, async () => await this.client.upload(this.localPath + this.stateName, this.stateName));
         }
     }
 }

@@ -751,7 +751,7 @@ describe("getDefaultSettings", () => {
             username: "b",
             password: "c",
             port: 54321,
-            protocol: "ftps-legacy",
+            protocol: "sftp",
             "local-dir": "./client/",
             "server-dir": "./server/",
             "state-name": ".customState.json",
