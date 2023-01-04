@@ -276,8 +276,8 @@ describe("FTP sync commands", () => {
         expect(spyRemoveFile).toHaveBeenCalledWith("server-dir/path/file.txt", "upload");
 
         expect(mockClientUploadFrom).toHaveBeenCalledTimes(2);
-        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "path/file.txt", "server-dir/path/file.txt");
-        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(2, "local-dir/state-name", "state-name");
+        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "local-dir/path/file.txt", "server-dir/path/file.txt");
+        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(2, "local-dir/state-name", "server-dir/state-name");
     });
 
     test("rename file", async () => {
@@ -340,8 +340,8 @@ describe("FTP sync commands", () => {
         expect(mockClientRemove).toHaveBeenNthCalledWith(1, "server-dir/path/oldFile.txt");
 
         expect(mockClientUploadFrom).toHaveBeenCalledTimes(2);
-        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "path/newName.txt", "server-dir/path/newName.txt");
-        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(2, "local-dir/state-name", "state-name");
+        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "local-dir/path/newName.txt", "server-dir/path/newName.txt");
+        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(2, "local-dir/state-name", "server-dir/state-name");
     });
 
     test("replace file", async () => {
@@ -396,8 +396,8 @@ describe("FTP sync commands", () => {
         expect(spyUploadFile).toHaveBeenCalledWith("server-dir/path/file.txt", "replace");
 
         expect(mockClientUploadFrom).toHaveBeenCalledTimes(2);
-        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "path/file.txt", "server-dir/path/file.txt");
-        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(2, "local-dir/state-name", "state-name");
+        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "local-dir/path/file.txt", "server-dir/path/file.txt");
+        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(2, "local-dir/state-name", "server-dir/state-name");
     });
 
     test("remove file", async () => {
@@ -449,7 +449,7 @@ describe("FTP sync commands", () => {
         expect(mockClientRemove).toHaveBeenNthCalledWith(1, "server-dir/path/file.txt");
 
         expect(mockClientUploadFrom).toHaveBeenCalledTimes(1);
-        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "local-dir/state-name", "state-name");
+        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "local-dir/state-name", "server-dir/state-name");
     });
 
     test("remove folder", async () => {
@@ -512,7 +512,7 @@ describe("FTP sync commands", () => {
         expect(mockClientRemove).toHaveBeenCalledTimes(0);
 
         expect(mockClientUploadFrom).toHaveBeenCalledTimes(1);
-        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "local-dir/state-name", "state-name");
+        expect(mockClientUploadFrom).toHaveBeenNthCalledWith(1, "local-dir/state-name", "server-dir/state-name");
     });
 });
 
