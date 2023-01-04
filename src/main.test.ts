@@ -732,7 +732,7 @@ describe("getDefaultSettings", () => {
             username: "b",
             password: "c",
             port: 22,
-            protocol: "ftp",
+            protocol: "sftp",
             "local-dir": "./",
             "server-dir": "./",
             "state-name": ".ftp-deploy-sync-state.json",
