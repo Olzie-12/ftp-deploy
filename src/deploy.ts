@@ -2,29 +2,29 @@ import * as ftp from "qusly-core";
 import fs from "fs";
 import {IFileList, IDiff, syncFileDescription, currentSyncFileVersion, IFtpDeployArgumentsWithDefaults} from "./types";
 import {HashDiff} from "./HashDiff";
-import {ILogger, retryRequest, ITimings, applyExcludeFilter, formatNumber} from "./utilities";
+import {ILogger, retryRequest, ITimings, formatNumber} from "./utilities";
 import prettyBytes from "pretty-bytes";
 import {prettyError} from "./errorHandling";
 import {ensureDir, FTPSyncProvider} from "./syncProvider";
 import {getLocalFiles} from "./localFiles";
 import {ITransfer, ITransferProgress} from "qusly-core";
 
-async function downloadFileList(client: ftp.Client, logger: ILogger, path: string): Promise<IFileList> {
-    // note: originally this was using a writable stream instead of a buffer file
-    // basic-ftp doesn't seam to close the connection when using steams over some ftps connections. This appears to be dependent on the ftp server
-    const tempFileNameHack = ".ftp-deploy-sync-server-state-buffer-file---delete.json";
-    await retryRequest(logger, async () => await client.download(tempFileNameHack, path).catch(reason => {
-        console.log(reason)
-        fs.unlinkSync(tempFileNameHack);
-    }));
-
-    const fileAsString = fs.readFileSync(tempFileNameHack, {encoding: "utf-8"});
-    const fileAsObject = JSON.parse(fileAsString) as IFileList;
-
-    fs.unlinkSync(tempFileNameHack);
-
-    return fileAsObject;
-}
+// async function downloadFileList(client: ftp.Client, logger: ILogger, path: string): Promise<IFileList> {
+//     // note: originally this was using a writable stream instead of a buffer file
+//     // basic-ftp doesn't seam to close the connection when using steams over some ftps connections. This appears to be dependent on the ftp server
+//     const tempFileNameHack = ".ftp-deploy-sync-server-state-buffer-file---delete.json";
+//     await retryRequest(logger, async () => await client.download(tempFileNameHack, path).catch(reason => {
+//         console.log(reason)
+//         fs.unlinkSync(tempFileNameHack);
+//     }));
+//
+//     const fileAsString = fs.readFileSync(tempFileNameHack, {encoding: "utf-8"});
+//     const fileAsObject = JSON.parse(fileAsString) as IFileList;
+//
+//     fs.unlinkSync(tempFileNameHack);
+//
+//     return fileAsObject;
+// }
 
 function createLocalState(localFiles: IFileList, logger: ILogger, args: IFtpDeployArgumentsWithDefaults): void {
     logger.verbose(`Creating local state at ${args["local-dir"]}${args["state-name"]}`);
@@ -99,27 +99,27 @@ export async function getServerFiles(client: ftp.Client, logger: ILogger, timing
             throw new Error("dangerous-clean-slate was run");
         }
         await ensureDir(client, logger, timings, args["server-dir"]);
-        const serverFiles = await downloadFileList(client, logger, args["server-dir"] + args["state-name"]);
-        logger.all(`----------------------------------------------------------------`);
-        logger.all(`Last published on 📅 ${new Date(serverFiles.generatedTime).toLocaleDateString(undefined, {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric"
-        })}`);
-
+        // const serverFiles = await downloadFileList(client, logger, args["server-dir"] + args["state-name"]);
+        // logger.all(`----------------------------------------------------------------`);
+        // logger.all(`Last published on 📅 ${new Date(serverFiles.generatedTime).toLocaleDateString(undefined, {
+        //     weekday: "long",
+        //     year: "numeric",
+        //     month: "long",
+        //     day: "numeric",
+        //     hour: "numeric",
+        //     minute: "numeric"
+        // })}`);
         // apply exclude options to server
-        if (args.exclude.length > 0) {
-            const filteredData = serverFiles.data.filter((item) => applyExcludeFilter({
-                path: item.name,
-                isDirectory: () => item.type === "folder"
-            }, args.exclude));
-            serverFiles.data = filteredData;
-        }
-
-        return serverFiles;
+        // if (args.exclude.length > 0) {
+        //     const filteredData = serverFiles.data.filter((item) => applyExcludeFilter({
+        //         path: item.name,
+        //         isDirectory: () => item.type === "folder"
+        //     }, args.exclude));
+        //     serverFiles.data = filteredData;
+        // }
+        //
+        // return serverFiles;
+        throw new Error("dangerous-clean-slate was run");
     } catch (error) {
         logger.all(`----------------------------------------------------------------`);
         logger.all(`No file exists on the server "${args["server-dir"] + args["state-name"]}" - this must be your first publish! 🎉`);
