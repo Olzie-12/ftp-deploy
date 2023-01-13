@@ -222,7 +222,7 @@ export async function deploy(args: IFtpDeployArgumentsWithDefaults, logger: ILog
         prettyError(logger, args, error);
         throw error;
     } finally {
-        setTimeout(async () => client.disconnect(), 100);
+        setTimeout(async () => client.disconnect(), 1000);
         timings.stop("total");
     }
 
