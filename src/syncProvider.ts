@@ -52,7 +52,7 @@ export class FTPSyncProvider implements ISyncProvider {
 
     /**
      * Converts a file path (ex: "folder/otherfolder/file.txt") to an array of folder and a file path
-     * @param fullPath 
+     * @param fullPath
      */
     private getFileBreadcrumbs(fullPath: string): IFilePath {
         // todo see if this regex will work for nonstandard folder names
@@ -68,67 +68,80 @@ export class FTPSyncProvider implements ISyncProvider {
     }
 
     async createFolder(folderPath: string) {
-        this.logger.all(`creating folder "${folderPath}"`);
+        try {
+            this.logger.all(`creating folder "${folderPath}"`);
 
-        if (this.dryRun === true) {
-            return;
+            if (this.dryRun === true) {
+                return;
+            }
+
+            const path = this.getFileBreadcrumbs(folderPath + "/");
+
+            if (path.folders === null) {
+                this.logger.verbose(`  no need to change dir`);
+            } else {
+                await ensureDir(this.client, this.logger, this.timings, path.folders.join("/"));
+            }
+
+            this.logger.verbose(`  completed`);
+        } catch (e) {
+            console.log(e)
         }
-
-        const path = this.getFileBreadcrumbs(folderPath + "/");
-
-        if (path.folders === null) {
-            this.logger.verbose(`  no need to change dir`);
-        }
-        else {
-            await ensureDir(this.client, this.logger, this.timings, path.folders.join("/"));
-        }
-
-        this.logger.verbose(`  completed`);
     }
 
     async removeFile(filePath: string) {
-        this.logger.all(`removing "${filePath}"`);
+        try {
+            this.logger.all(`removing "${filePath}"`);
 
-        if (this.dryRun === false) {
-            try {
-                await retryRequest(this.logger, async () => await this.client.removeFile(filePath));
-            }
-            catch (e: any) {
-                // this error is common when a file was deleted on the server directly
-                if (e.code === ErrorCode.FileNotFoundOrNoAccess) {
-                    this.logger.standard("File not found or you don't have access to the file - skipping...");
+            if (this.dryRun === false) {
+                try {
+                    await retryRequest(this.logger, async () => await this.client.removeFile(filePath));
+                } catch (e: any) {
+                    // this error is common when a file was deleted on the server directly
+                    if (e.code === ErrorCode.FileNotFoundOrNoAccess) {
+                        this.logger.standard("File not found or you don't have access to the file - skipping...");
+                    } else {
+                        throw e;
+                    }
                 }
-                else {
-                    throw e;
-                }
             }
+            this.logger.verbose(`  file removed`);
+
+            this.logger.verbose(`  completed`);
+        } catch (e) {
+            console.log(e)
         }
-        this.logger.verbose(`  file removed`);
-
-        this.logger.verbose(`  completed`);
     }
 
     async removeFolder(folderPath: string) {
-        const absoluteFolderPath = "/" + (this.serverPath.startsWith("./") ? this.serverPath.replace("./", "") : this.serverPath) + folderPath;
-        this.logger.all(`removing folder "${absoluteFolderPath}"`);
+        try {
+            const absoluteFolderPath = "/" + (this.serverPath.startsWith("./") ? this.serverPath.replace("./", "") : this.serverPath) + folderPath;
+            this.logger.all(`removing folder "${absoluteFolderPath}"`);
 
-        if (this.dryRun === false) {
-            await retryRequest(this.logger, async () => await this.client.removeFolder(absoluteFolderPath));
+            if (this.dryRun === false) {
+                await retryRequest(this.logger, async () => await this.client.removeFolder(absoluteFolderPath));
+            }
+
+            this.logger.verbose(`  completed`);
+        } catch (e) {
+            console.log(e)
         }
-
-        this.logger.verbose(`  completed`);
     }
 
     async uploadFile(filePath: string, type: "upload" | "replace" = "upload") {
-        const typePresent = type === "upload" ? "uploading" : "replacing";
-        const typePast = type === "upload" ? "uploaded" : "replaced";
-        this.logger.all(`${typePresent} "${filePath}"`);
+        try {
+            const typePresent = type === "upload" ? "uploading" : "replacing";
+            const typePast = type === "upload" ? "uploaded" : "replaced";
+            this.logger.all(`${typePresent} "${filePath}"`);
 
-        if (this.dryRun === false) {
-            await retryRequest(this.logger, async () => await this.client.upload(this.localPath + filePath.substring(this.serverPath.length), filePath));
+            if (this.dryRun === false) {
+                await retryRequest(this.logger, async () => await this.client.upload(this.localPath + filePath.substring(this.serverPath.length), filePath));
+            }
+
+            this.logger.verbose(`  file ${typePast}`);
+        } catch (e) {
+            console.log(e)
         }
-
-        this.logger.verbose(`  file ${typePast}`);
     }
 
     async syncLocalToServer(diffs: DiffResult) {
