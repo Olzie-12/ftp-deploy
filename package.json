@@ -31,7 +31,7 @@
     "multimatch": "^5.0.0",
     "pretty-bytes": "^5.6.0",
     "pretty-ms": "^7.0.1",
-    "@olzie-12/qusly-core": "4.0.4",
+    "@olzie-12/qusly-core": "4.0.5",
     "readdir-enhanced": "^6.0.4",
     "yargs": "^17.5.1"
   },
