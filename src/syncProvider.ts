@@ -141,28 +141,38 @@ export class FTPSyncProvider implements ISyncProvider {
 
         // create new folders
         for (const file of diffs.upload.filter(item => item.type === "folder")) {
-            await this.createFolder(this.serverPath + file.name);
+            await this.createFolder(this.serverPath + file.name).catch(reason => {
+                console.log(reason)
+            })
         }
 
         // upload new files
         for (const file of diffs.upload.filter(item => item.type === "file").filter(item => item.name !== this.stateName)) {
-            await this.uploadFile(this.serverPath + file.name, "upload");
+            await this.uploadFile(this.serverPath + file.name, "upload").catch(reason => {
+                console.log(reason)
+            })
         }
 
         // replace new files
         for (const file of diffs.replace.filter(item => item.type === "file").filter(item => item.name !== this.stateName)) {
             // note: FTP will replace old files with new files. We run replacements after uploads to limit downtime
-            await this.uploadFile(this.serverPath + file.name, "replace");
+            await this.uploadFile(this.serverPath + file.name, "replace").catch(reason => {
+                console.log(reason)
+            })
         }
 
         // delete old files
         for (const file of diffs.delete.filter(item => item.type === "file")) {
-            await this.removeFile(this.serverPath + file.name);
+            await this.removeFile(this.serverPath + file.name).catch(reason => {
+                console.log(reason)
+            })
         }
 
         // delete old folders
         for (const file of diffs.delete.filter(item => item.type === "folder")) {
-            await this.removeFolder(this.serverPath + file.name);
+            await this.removeFolder(this.serverPath + file.name).catch(reason => {
+                console.log(reason)
+            })
         }
 
         this.logger.all(`----------------------------------------------------------------`);
