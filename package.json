@@ -1,6 +1,6 @@
 {
   "name": "@olzie-12/ftp-deploy",
-  "version": "1.2.23",
+  "version": "1.2.24",
   "private": false,
   "description": "Deploy files to a ftp server",
   "main": "dist/module.js",
@@ -31,7 +31,7 @@
     "multimatch": "^5.0.0",
     "pretty-bytes": "^5.6.0",
     "pretty-ms": "^7.0.1",
-    "qusly-core": "4.0.4",
+    "@olzie-12/qusly-core": "4.0.4",
     "readdir-enhanced": "^6.0.4",
     "yargs": "^17.5.1"
   },
