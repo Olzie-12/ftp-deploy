@@ -1,6 +1,6 @@
 {
   "name": "@olzie-12/ftp-deploy",
-  "version": "1.2.28",
+  "version": "1.2.29",
   "private": false,
   "description": "Deploy files to a ftp server",
   "main": "dist/module.js",
@@ -26,12 +26,12 @@
   "author": "Olzie",
   "license": "MIT",
   "dependencies": {
+    "@olzie-12/qusly-core": "^4.0.13",
     "fix": "^0.0.6",
     "lodash": "^4.17.21",
     "multimatch": "^5.0.0",
     "pretty-bytes": "^5.6.0",
     "pretty-ms": "^7.0.1",
-    "@olzie-12/qusly-core": "4.0.12",
     "readdir-enhanced": "^6.0.4",
     "yargs": "^17.5.1"
   },
