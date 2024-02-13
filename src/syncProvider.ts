@@ -68,80 +68,67 @@ export class FTPSyncProvider implements ISyncProvider {
     }
 
     async createFolder(folderPath: string) {
-        try {
-            this.logger.all(`creating folder "${folderPath}"`);
+        this.logger.all(`creating folder "${folderPath}"`);
 
-            if (this.dryRun === true) {
-                return;
-            }
-
-            const path = this.getFileBreadcrumbs(folderPath + "/");
-
-            if (path.folders === null) {
-                this.logger.verbose(`  no need to change dir`);
-            } else {
-                await ensureDir(this.client, this.logger, this.timings, path.folders.join("/"));
-            }
-
-            this.logger.verbose(`  completed`);
-        } catch (e) {
-            console.log(e)
+        if (this.dryRun === true) {
+            return;
         }
+
+        const path = this.getFileBreadcrumbs(folderPath + "/");
+
+        if (path.folders === null) {
+            this.logger.verbose(`  no need to change dir`);
+        }
+        else {
+            await ensureDir(this.client, this.logger, this.timings, path.folders.join("/"));
+        }
+
+        this.logger.verbose(`  completed`);
     }
 
     async removeFile(filePath: string) {
-        try {
-            this.logger.all(`removing "${filePath}"`);
+        this.logger.all(`removing "${filePath}"`);
 
-            if (this.dryRun === false) {
-                try {
-                    await retryRequest(this.logger, async () => await this.client.removeFile(filePath));
-                } catch (e: any) {
-                    // this error is common when a file was deleted on the server directly
-                    if (e.code === ErrorCode.FileNotFoundOrNoAccess) {
-                        this.logger.standard("File not found or you don't have access to the file - skipping...");
-                    } else {
-                        throw e;
-                    }
+        if (this.dryRun === false) {
+            try {
+                await retryRequest(this.logger, async () => await this.client.removeFile(filePath));
+            }
+            catch (e: any) {
+                // this error is common when a file was deleted on the server directly
+                if (e.code === ErrorCode.FileNotFoundOrNoAccess) {
+                    this.logger.standard("File not found or you don't have access to the file - skipping...");
+                }
+                else {
+                    throw e;
                 }
             }
-            this.logger.verbose(`  file removed`);
-
-            this.logger.verbose(`  completed`);
-        } catch (e) {
-            console.log(e)
         }
+        this.logger.verbose(`  file removed`);
+
+        this.logger.verbose(`  completed`);
     }
 
     async removeFolder(folderPath: string) {
-        try {
-            const absoluteFolderPath = "/" + (this.serverPath.startsWith("./") ? this.serverPath.replace("./", "") : this.serverPath) + folderPath;
-            this.logger.all(`removing folder "${absoluteFolderPath}"`);
+        const absoluteFolderPath = "/" + (this.serverPath.startsWith("./") ? this.serverPath.replace("./", "") : this.serverPath) + folderPath;
+        this.logger.all(`removing folder "${absoluteFolderPath}"`);
 
-            if (this.dryRun === false) {
-                await retryRequest(this.logger, async () => await this.client.removeFolder(absoluteFolderPath));
-            }
-
-            this.logger.verbose(`  completed`);
-        } catch (e) {
-            console.log(e)
+        if (this.dryRun === false) {
+            await retryRequest(this.logger, async () => await this.client.removeFolder(absoluteFolderPath));
         }
+
+        this.logger.verbose(`  completed`);
     }
 
     async uploadFile(filePath: string, type: "upload" | "replace" = "upload") {
-        try {
-            const typePresent = type === "upload" ? "uploading" : "replacing";
-            const typePast = type === "upload" ? "uploaded" : "replaced";
-            this.logger.all(`${typePresent} "${filePath}"`);
+        const typePresent = type === "upload" ? "uploading" : "replacing";
+        const typePast = type === "upload" ? "uploaded" : "replaced";
+        this.logger.all(`${typePresent} "${filePath}"`);
 
-            if (this.dryRun === false) {
-                await retryRequest(this.logger, async () => await this.client.upload(this.localPath + filePath.substring(this.serverPath.length), filePath));
-            }
-
-            this.logger.verbose(`  file ${typePast}`);
-        } catch (e) {
-            console.log(e)
+        if (this.dryRun === false) {
+            await retryRequest(this.logger, async () => await this.client.upload(this.localPath + filePath.substring(this.serverPath.length), filePath));
         }
+
+        this.logger.verbose(`  file ${typePast}`);
     }
 
     async syncLocalToServer(diffs: DiffResult) {
@@ -154,38 +141,28 @@ export class FTPSyncProvider implements ISyncProvider {
 
         // create new folders
         for (const file of diffs.upload.filter(item => item.type === "folder")) {
-            await this.createFolder(this.serverPath + file.name).catch(reason => {
-                console.log(reason)
-            })
+            await this.createFolder(this.serverPath + file.name);
         }
 
         // upload new files
         for (const file of diffs.upload.filter(item => item.type === "file").filter(item => item.name !== this.stateName)) {
-            await this.uploadFile(this.serverPath + file.name, "upload").catch(reason => {
-                console.log(reason)
-            })
+            await this.uploadFile(this.serverPath + file.name, "upload");
         }
 
         // replace new files
         for (const file of diffs.replace.filter(item => item.type === "file").filter(item => item.name !== this.stateName)) {
             // note: FTP will replace old files with new files. We run replacements after uploads to limit downtime
-            await this.uploadFile(this.serverPath + file.name, "replace").catch(reason => {
-                console.log(reason)
-            })
+            await this.uploadFile(this.serverPath + file.name, "replace");
         }
 
         // delete old files
         for (const file of diffs.delete.filter(item => item.type === "file")) {
-            await this.removeFile(this.serverPath + file.name).catch(reason => {
-                console.log(reason)
-            })
+            await this.removeFile(this.serverPath + file.name);
         }
 
         // delete old folders
         for (const file of diffs.delete.filter(item => item.type === "folder")) {
-            await this.removeFolder(this.serverPath + file.name).catch(reason => {
-                console.log(reason)
-            })
+            await this.removeFolder(this.serverPath + file.name);
         }
 
         this.logger.all(`----------------------------------------------------------------`);
