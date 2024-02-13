@@ -1,4 +1,4 @@
-import ** as ftp from "qusly-core";
+import * as ftp from "qusly-core";
 import fs from "fs";
 import {IFileList, IDiff, syncFileDescription, currentSyncFileVersion, IFtpDeployArgumentsWithDefaults} from "./types";
 import {HashDiff} from "./HashDiff";
@@ -8,16 +8,6 @@ import {prettyError} from "./errorHandling";
 import {ensureDir, FTPSyncProvider} from "./syncProvider";
 import {getLocalFiles} from "./localFiles";
 import {ITransfer, ITransferProgress} from "qusly-core";
-as ftp from "qusly-core";
-import fs from "fs";
-import {IFileList, IDiff, syncFileDescription, currentSyncFileVersion, IFtpDeployArgumentsWithDefaults} from "./types";
-import {HashDiff} from "./HashDiff";
-import {ILogger, retryRequest, ITimings, formatNumber} from "./utilities";
-import prettyBytes from "pretty-bytes";
-import {prettyError} from "./errorHandling";
-import {ensureDir, FTPSyncProvider} from "./syncProvider";
-import {getLocalFiles} from "./localFiles";
-import {ITransfer, ITransferProgress} from "@olzie-12/qusly-core";
 
 // async function downloadFileList(client: ftp.Client, logger: ILogger, path: string): Promise<IFileList> {
 //     // note: originally this was using a writable stream instead of a buffer file
