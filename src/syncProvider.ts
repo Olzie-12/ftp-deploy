@@ -6,10 +6,12 @@ import { ILogger, pluralize, retryRequest, ITimings } from "./utilities";
 export async function ensureDir(client: ftp.Client, logger: ILogger, timings: ITimings, folder: string): Promise<void> {
     timings.start("changingDir");
     logger.verbose(`  changing dir to ${folder}`);
-
-    await retryRequest(logger, async () => await client.createFolder(folder).catch(reason => {
-        console.log(reason)
-    }));
+    await retryRequest(logger, async () => {
+        const folders = folder.split("/").filter(folder => folder !== "");
+        for (const folder of folders) {
+            await client.createFolder(folder)
+        }
+    });
 
     logger.verbose(`  dir changed`);
     timings.stop("changingDir");
