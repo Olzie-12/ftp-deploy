@@ -1,6 +1,6 @@
 {
   "name": "@olzie-12/ftp-deploy",
-  "version": "1.2.34",
+  "version": "1.2.35",
   "private": false,
   "description": "Deploy files to a ftp server",
   "main": "dist/module.js",
