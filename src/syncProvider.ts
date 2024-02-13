@@ -9,7 +9,9 @@ export async function ensureDir(client: ftp.Client, logger: ILogger, timings: IT
     await retryRequest(logger, async () => {
         const folders = folder.split("/").filter(folder => folder !== "");
         for (const folder of folders) {
-            await client.createFolder(folder)
+            await client.createFolder(folder).catch((e: any) => {
+                console.log(e);
+            });
         }
     });
 
