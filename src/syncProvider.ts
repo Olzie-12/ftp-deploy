@@ -8,10 +8,10 @@ export async function ensureDir(client: ftp.Client, logger: ILogger, timings: IT
     logger.verbose(`  changing dir to ${folder}`);
     await retryRequest(logger, async () => {
         const folders = folder.split("/").filter(folder => folder !== "");
+        var previousDir = "";
         for (const folder of folders) {
-            await client.createFolder(folder).catch((e: any) => {
-                console.log(e);
-            });
+            await client.createFolder(previousDir + folder).catch((e: any) => {});
+            previousDir += folder + "/";
         }
     });
 
