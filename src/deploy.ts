@@ -1,4 +1,14 @@
-import * as ftp from "@olzie-12/qusly-core";
+import ** as ftp from "qusly-core";
+import fs from "fs";
+import {IFileList, IDiff, syncFileDescription, currentSyncFileVersion, IFtpDeployArgumentsWithDefaults} from "./types";
+import {HashDiff} from "./HashDiff";
+import {ILogger, retryRequest, ITimings, formatNumber} from "./utilities";
+import prettyBytes from "pretty-bytes";
+import {prettyError} from "./errorHandling";
+import {ensureDir, FTPSyncProvider} from "./syncProvider";
+import {getLocalFiles} from "./localFiles";
+import {ITransfer, ITransferProgress} from "qusly-core";
+as ftp from "qusly-core";
 import fs from "fs";
 import {IFileList, IDiff, syncFileDescription, currentSyncFileVersion, IFtpDeployArgumentsWithDefaults} from "./types";
 import {HashDiff} from "./HashDiff";
