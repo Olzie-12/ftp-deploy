@@ -9,6 +9,7 @@ import { FTPSyncProvider } from "./syncProvider";
 import { deploy, getServerFiles } from "./deploy";
 import { Stats as readdirStats } from "@jsdevtools/readdir-enhanced";
 import { excludeDefaults } from "./module";
+import { describe, test, expect, jest } from "@jest/globals";
 
 const tenFiles: Record[] = [
     {
